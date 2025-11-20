@@ -14,7 +14,7 @@ public class LoginController extends HttpServlet {
             if (session != null) {
                 session.invalidate();
             }
-            response.sendRedirect("/login");
+            response.sendRedirect(request.getContextPath() + "/LoginServlet");
             return;
         }
         // Default: show login page
@@ -25,13 +25,13 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-
         if ("login".equals(action)) {
             handleLogin(request, response);
         } else if ("signup".equals(action)) {
             handleSignup(request, response);
-        } else if ("guest".equals(action)) {
-            handleGuestLogin(request, response);
+        } else {
+            // Unknown action - redirect to login
+            response.sendRedirect(request.getContextPath() + "/LoginServlet");
         }
     }
 
@@ -45,7 +45,7 @@ public class LoginController extends HttpServlet {
             session.setAttribute("user", user);
             response.sendRedirect("/");
         } else {
-            response.sendRedirect("/login?error=Invalid credentials");
+            response.sendRedirect(request.getContextPath() + "/LoginServlet?error=Invalid credentials");
         }
     }
 
@@ -60,15 +60,11 @@ public class LoginController extends HttpServlet {
         user.setPassword(password);
 
         userDAO.create(user);
-        response.sendRedirect("/login?success=Account created");
+        response.sendRedirect(request.getContextPath() + "/LoginServlet?success=Account created");
     }
 
     private void handleGuestLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        User guest = new User();
-        guest.setGuest(true);
-
-        HttpSession session = request.getSession();
-        session.setAttribute("user", guest);
+        // Guest login removed. Unauthenticated users will be treated as guests on the client side.
         response.sendRedirect("/");
     }
 

@@ -36,4 +36,17 @@ public class RatingDAO {
         }
         return ratings;
     }
+
+    public void addRating(Rating rating) {
+        try {
+            String query = "INSERT INTO ratings (user_id, comic_id, stars) VALUES (?, ?, ?)";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setInt(1, rating.getUserId());
+            stmt.setInt(2, rating.getComicId());
+            stmt.setInt(3, rating.getStars());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

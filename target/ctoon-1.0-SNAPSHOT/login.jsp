@@ -13,7 +13,8 @@
     
     <main>
         <h2>Login to CToon</h2>
-        <form action="${pageContext.request.contextPath}/auth" method="post">
+        <form action="${pageContext.request.contextPath}/LoginServlet" method="post">
+            <input type="hidden" name="action" value="login" />
             <div>
                 <label for="username">Username or Email</label>
                 <input type="text" id="username" name="username" placeholder="Enter your username or email" required>
@@ -25,13 +26,7 @@
             <button type="submit">Login</button>
         </form>
         
-        <div style="text-align: center; margin: 2rem 0;">
-            <p>or continue as</p>
-            <form action="${pageContext.request.contextPath}/auth" method="post" style="max-width: 300px;">
-                <input type="hidden" name="guest" value="true">
-                <button type="submit" class="btn-secondary">Login as Guest</button>
-            </form>
-        </div>
+        <!-- Unauthenticated users are treated as guests automatically; explicit guest login removed -->
 
         <div style="text-align: center; margin-top: 2rem;">
             <p>Don't have an account? <a href="${pageContext.request.contextPath}/signup.jsp">Sign Up</a></p>

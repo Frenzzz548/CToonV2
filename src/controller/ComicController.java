@@ -10,6 +10,7 @@ import model.Comment;
 import model.Rating;
 import model.Bookmark;
 import model.User;
+import model.Page;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.IOException;
@@ -25,6 +26,13 @@ public class ComicController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getPathInfo();
+        String queryParam = request.getParameter("query");
+        if (queryParam != null && !queryParam.trim().isEmpty()) {
+            List<Comic> searchResults = comicDAO.searchComics(queryParam);
+            request.setAttribute("searchResults", searchResults);
+            request.getRequestDispatcher("/search.jsp").forward(request, response);
+            return;
+        }
         if (path == null || path.equals("/")) {
             // Homepage
             List<Comic> recentComics = comicDAO.getRecentComics();
@@ -32,14 +40,36 @@ public class ComicController extends HttpServlet {
             request.getRequestDispatcher("/index.jsp").forward(request, response);
             return;
         }
+        // Chapter view: /chapter?id=123 or /chapter/123
+        if (path.equals("/chapter") || path.startsWith("/chapter")) {
+            String idParam = request.getParameter("id");
+            if (idParam == null && path.length() > "/chapter/".length()) {
+                // try to extract from /chapter/123
+                String[] parts = path.split("/");
+                if (parts.length >= 3) {
+                    idParam = parts[2];
+                }
+            }
+            if (idParam != null) {
+                request.setAttribute("chapterId", idParam);
+                viewChapter(request, response);
+                return;
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+        }
 
-        // Remove leading slash
+        // Remove leading slash for comic slug lookup
         String comicName = path.substring(1);
-        Comic comic = comicDAO.getComicByName(comicName);
+        // find comic by slugified name
+        Comic comic = comicDAO.getComicBySlug(comicName);
         if (comic != null) {
             request.setAttribute("comic", comic);
             List<Rating> ratings = ratingDAO.getRatingsByComicId(comic.getId());
             request.setAttribute("ratings", ratings);
+            List<Chapter> chapters = chapterDAO.getChaptersByComicId(comic.getId());
+            request.setAttribute("chapters", chapters);
             boolean isBookmarked = false;
             HttpSession session = request.getSession(false);
             if (session != null && session.getAttribute("user") != null) {
@@ -56,13 +86,25 @@ public class ComicController extends HttpServlet {
     }
 
     private void viewChapter(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int chapterId = Integer.parseInt(request.getParameter("chapterId"));
+        String chapterIdStr = request.getParameter("chapterId");
+        if (chapterIdStr == null) {
+            Object attr = request.getAttribute("chapterId");
+            if (attr != null) chapterIdStr = String.valueOf(attr);
+        }
+        int chapterId = Integer.parseInt(chapterIdStr);
         Chapter chapter = chapterDAO.getChapterById(chapterId);
         List<Comment> comments = commentDAO.getCommentsByChapterId(chapterId);
+        List<Page> pages = chapterDAO.getPagesByChapterId(chapterId);
+        // Also get comic and chapters list for navigation
+        Comic comic = comicDAO.getComicById(chapter.getComicId());
+        List<Chapter> chapters = chapterDAO.getChaptersByComicId(comic.getId());
 
         request.setAttribute("chapter", chapter);
         request.setAttribute("comments", comments);
-        request.getRequestDispatcher("chapter.jsp").forward(request, response);
+        request.setAttribute("pages", pages);
+        request.setAttribute("comic", comic);
+        request.setAttribute("chapters", chapters);
+        request.getRequestDispatcher("/chapter.jsp").forward(request, response);
     }
 
     private void viewComic(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

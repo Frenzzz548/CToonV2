@@ -13,7 +13,8 @@
     
     <main>
         <h2>Create Your CToon Account</h2>
-        <form action="${pageContext.request.contextPath}/auth" method="post">
+        <form action="${pageContext.request.contextPath}/LoginServlet" method="post">
+            <input type="hidden" name="action" value="signup" />
             <div>
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" placeholder="Choose your username" required>
