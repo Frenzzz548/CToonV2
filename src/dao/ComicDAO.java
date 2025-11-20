@@ -23,7 +23,7 @@ public class ComicDAO {
 
     public Comic getComicById(int comicId) {
         try {
-            String query = "SELECT * FROM comics WHERE id = ?";
+            String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c WHERE c.id = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setInt(1, comicId);
             ResultSet rs = stmt.executeQuery();
@@ -48,7 +48,7 @@ public class ComicDAO {
     public List<Comic> getAllComics() {
         List<Comic> comics = new ArrayList<>();
         try {
-            String query = "SELECT * FROM comics LIMIT 50";
+            String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c LIMIT 50";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
@@ -71,7 +71,7 @@ public class ComicDAO {
     public List<Comic> getRecentComics() {
         List<Comic> comics = new ArrayList<>();
         try {
-            String query = "SELECT * FROM comics ORDER BY id DESC LIMIT 6";
+            String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c ORDER BY c.id DESC LIMIT 6";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
@@ -94,7 +94,7 @@ public class ComicDAO {
     public List<Comic> getTrendingComics() {
         List<Comic> comics = new ArrayList<>();
         try {
-            String query = "SELECT * FROM comics ORDER BY views DESC LIMIT 6";
+            String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c ORDER BY c.views DESC LIMIT 6";
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
@@ -117,8 +117,7 @@ public class ComicDAO {
     public Comic getComicBySlug(String slug) {
         try {
             // slug is expected to be lowercase with dashes replacing spaces
-            String query = "SELECT * FROM comics" +
-                    " WHERE REPLACE(LOWER(title),' ', '-') = ? LIMIT 1";
+            String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c WHERE REPLACE(LOWER(c.title),' ', '-') = ? LIMIT 1";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, slug.toLowerCase());
             ResultSet rs = stmt.executeQuery();
@@ -144,7 +143,7 @@ public class ComicDAO {
         List<Comic> comics = new ArrayList<>();
         try {
             String like = "%" + q + "%";
-            String query = "SELECT * FROM comics WHERE title LIKE ? OR description LIKE ? LIMIT 50";
+            String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c WHERE c.title LIKE ? OR c.description LIKE ? LIMIT 50";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, like);
             stmt.setString(2, like);

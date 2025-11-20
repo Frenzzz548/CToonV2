@@ -30,7 +30,7 @@
                         </span>
                     </div>
                     <p style="color: #666;">Author: <c:out default="Unknown" value="${comic.author}"/></p>
-                    <p style="margin: 1rem 0;">⭐<c:out default="0" value="${comic.averageRating}"/>/5</p>
+                    <p style="margin: 1rem 0;">⭐<strong><c:out value="${avgRating}" default="0.00"/></strong>/5</p>
                     <div style="display: flex; gap: 0.5rem;">
                         <button class="btn" style="flex: 1;">❤️ Bookmark</button>
                         <button class="btn btn-secondary" style="flex: 1;">⭐ Rate</button>
@@ -72,20 +72,28 @@
                     <h3>💬 Comments</h3>
                     <c:choose>
                         <c:when test="${not empty chapters}">
-                            <form method="post" action="${pageContext.request.contextPath}/comic-detail" style="margin-bottom: 1rem;">
-                                <input type="hidden" name="action" value="addComment" />
-                                <input type="hidden" name="comicId" value="${comic.id}" />
-                                <input type="hidden" name="chapterId" value="${chapters[0].id}" />
-                                <textarea name="content" placeholder="Add a comment..." style="width:100%; min-height:100px; padding:0.8rem; border-radius:8px; border:1px solid #e0e0e0;"></textarea>
-                                <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
-                                    <button class="btn" type="submit">Post Comment</button>
-                                    <a class="btn btn-secondary" href="${pageContext.request.contextPath}/login.jsp">Login to comment</a>
-                                </div>
-                            </form>
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.user}">
+                                    <form method="post" action="${pageContext.request.contextPath}/comic-detail" style="margin-bottom: 1rem;">
+                                        <input type="hidden" name="action" value="addComment" />
+                                        <input type="hidden" name="comicId" value="${comic.id}" />
+                                        <label for="chapterId">Comment for chapter:</label>
+                                        <select name="chapterId" id="chapterId" style="display:block; margin:0.5rem 0 0.75rem; padding:0.6rem; border-radius:8px;">
+                                            <c:forEach items="${chapters}" var="ch">
+                                                <option value="${ch.id}">Chapter ${ch.number} - ${ch.title}</option>
+                                            </c:forEach>
+                                        </select>
+                                        <textarea name="content" placeholder="Add a comment..." style="width:100%; min-height:100px; padding:0.8rem; border-radius:8px; border:1px solid #e0e0e0;"></textarea>
+                                        <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+                                            <button class="btn" type="submit">Post Comment</button>
+                                        </div>
+                                    </form>
+                                </c:when>
+                                <c:otherwise>
+                                    <p>Please <a href="${pageContext.request.contextPath}/login.jsp">login</a> to comment.</p>
+                                </c:otherwise>
+                            </c:choose>
                         </c:when>
-                        <c:otherwise>
-                            <p>Please <a href="${pageContext.request.contextPath}/login.jsp">login</a> to comment.</p>
-                        </c:otherwise>
                     </c:choose>
 
                     <div style="margin-top: 1.5rem; border-top: 1px solid #e0e0e0; padding-top: 1rem;">
@@ -131,19 +139,26 @@
                         </c:otherwise>
                     </c:choose>
 
-                    <form method="post" action="${pageContext.request.contextPath}/comic-detail" style="margin-top:1rem;">
-                        <input type="hidden" name="action" value="addRating" />
-                        <input type="hidden" name="comicId" value="${comic.id}" />
-                        <label for="stars">Give a rating:</label>
-                        <select name="stars" id="stars" style="display:block; margin:0.5rem 0 1rem; padding:0.6rem; border-radius:8px;">
-                            <option value="5">5 - Excellent</option>
-                            <option value="4">4 - Very Good</option>
-                            <option value="3">3 - Good</option>
-                            <option value="2">2 - Fair</option>
-                            <option value="1">1 - Poor</option>
-                        </select>
-                        <button class="btn" type="submit">Submit Rating</button>
-                    </form>
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.user}">
+                            <form method="post" action="${pageContext.request.contextPath}/comic-detail" style="margin-top:1rem;">
+                                <input type="hidden" name="action" value="addRating" />
+                                <input type="hidden" name="comicId" value="${comic.id}" />
+                                <label for="stars">Give a rating:</label>
+                                <select name="stars" id="stars" style="display:block; margin:0.5rem 0 1rem; padding:0.6rem; border-radius:8px;">
+                                    <option value="5">5 - Excellent</option>
+                                    <option value="4">4 - Very Good</option>
+                                    <option value="3">3 - Good</option>
+                                    <option value="2">2 - Fair</option>
+                                    <option value="1">1 - Poor</option>
+                                </select>
+                                <button class="btn" type="submit">Submit Rating</button>
+                            </form>
+                        </c:when>
+                        <c:otherwise>
+                            <p>Please <a href="${pageContext.request.contextPath}/login.jsp">login</a> to rate.</p>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </div>
         </div>

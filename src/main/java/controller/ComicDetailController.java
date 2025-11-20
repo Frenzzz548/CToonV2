@@ -87,7 +87,7 @@ public class ComicDetailController extends HttpServlet {
                 rating.setUserId(user.getId());
                 rating.setComicId(comicId);
                 rating.setStars(stars);
-                ratingDAO.addRating(rating);
+                ratingDAO.addOrUpdateRating(rating);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }

@@ -24,29 +24,18 @@
                     <c:when test="${not empty recentComics}">
                         <c:forEach items="${recentComics}" var="comic">
                             <div class="card">
-                                <h3>${comic.title}</h3>
-                                <p>${comic.description}</p>
-                                <p><small>Author: ${comic.author}</small></p>
-                                <p><small>⭐ ${comic.averageRating}/5 | Views: ${comic.views}</small></p>
+                                <h3><c:out value="${comic.title}"/></h3>
+                                <p><c:out value="${comic.description}"/></p>
+                                <p><small>Author: <c:out value="${comic.author}"/></small></p>
+                                <p><small>⭐ <c:out value="${comic.averageRating}"/>/5 | Views: <c:out value="${comic.views}"/></small></p>
                                 <a href="${pageContext.request.contextPath}/comic-detail?id=${comic.id}" class="btn">Read Now</a>
                             </div>
                         </c:forEach>
                     </c:when>
                     <c:otherwise>
                         <div class="card">
-                            <h3>Sample Comic 1</h3>
-                            <p>An exciting adventure awaits...</p>
-                            <a href="${pageContext.request.contextPath}/comic.jsp" class="btn">Read Now</a>
-                        </div>
-                        <div class="card">
-                            <h3>Sample Comic 2</h3>
-                            <p>A mysterious tale unfolds...</p>
-                            <a href="${pageContext.request.contextPath}/comic.jsp" class="btn">Read Now</a>
-                        </div>
-                        <div class="card">
-                            <h3>Sample Comic 3</h3>
-                            <p>Epic battles and dramatic twists...</p>
-                            <a href="${pageContext.request.contextPath}/comic.jsp" class="btn">Read Now</a>
+                            <h3>No comics available</h3>
+                            <p>There are no comics in the database yet. Please check back later.</p>
                         </div>
                     </c:otherwise>
                 </c:choose>
