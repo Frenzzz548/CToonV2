@@ -95,14 +95,22 @@ class CToonDBAutomation:
                         match = re.search(r'(\d+)', chapter_dir)
                         if match:
                             chapter_num = int(match.group(1))
-                            pages = [f for f in os.listdir(chapter_path) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-                            if pages:
+                            page_files = [f for f in os.listdir(chapter_path) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+                            # natural sort pages (01.png, 2.png, etc.)
+                            def natural_key(s):
+                                parts = re.split(r'(\d+)', s)
+                                return [int(p) if p.isdigit() else p.lower() for p in parts]
+
+                            page_files = sorted(page_files, key=natural_key)
+                            if page_files:
                                 chapters[chapter_num] = {
                                     'dir': chapter_dir,
-                                    'pages': len(pages),
-                                    'path': f'/assets/comics/{comic_name}/{chapter_dir}'
+                                    'pages': len(page_files),
+                                    'path': f'/assets/comics/{comic_name}/{chapter_dir}',
+                                    'files': page_files,
+                                    'comic_dir_name': comic_name
                                 }
-                
+
                 if chapters:
                     comics[comic_name] = chapters
                     print(f"  Found {len(chapters)} chapter(s) in '{comic_name}'")
@@ -152,6 +160,23 @@ class CToonDBAutomation:
         except mysql.connector.Error as err:
             print(f"  ✗ Error with chapter '{title}': {err}")
             return None
+
+    def get_or_create_page(self, chapter_id, page_number, image_path):
+        """Get existing page by chapter+page_number or insert it"""
+        try:
+            query = "SELECT id FROM pages WHERE chapter_id = %s AND page_number = %s"
+            self.cursor.execute(query, (chapter_id, page_number))
+            result = self.cursor.fetchone()
+            if result:
+                return result['id']
+            else:
+                query = "INSERT INTO pages (chapter_id, page_number, image_path) VALUES (%s, %s, %s)"
+                self.cursor.execute(query, (chapter_id, page_number, image_path))
+                self.conn.commit()
+                return self.cursor.lastrowid
+        except mysql.connector.Error as err:
+            print(f"    ✗ Error inserting page {page_number} for chapter_id {chapter_id}: {err}")
+            return None
     
     def populate_database(self):
         """Scan assets and populate database"""
@@ -184,19 +209,28 @@ class CToonDBAutomation:
             cover_info = covers.get(comic_name, {})
             cover_path = cover_info.get('main_cover', '/assets/covers/default.png')
             category = categories.get(comic_name, 'Manga')
-            
+
             description = f"A popular manga series with {len(chapter_list)} chapters available."
-            
+
             print(f"\n📖 Processing '{comic_name}'...")
             comic_id = self.get_or_create_comic(comic_name, description, cover_path, category)
-            
+
             if comic_id:
-                # Add chapters
+                # Add chapters and pages
                 for chapter_num in sorted(chapter_list.keys()):
                     chapter_info = chapter_list[chapter_num]
                     chapter_title = f"Chapter {chapter_num}"
                     print(f"    Chapter {chapter_num}: {chapter_info['pages']} pages")
-                    self.get_or_create_chapter(comic_id, chapter_title, chapter_num)
+                    chapter_id = self.get_or_create_chapter(comic_id, chapter_title, chapter_num)
+                    if chapter_id and 'files' in chapter_info:
+                        # Insert pages for the chapter
+                        for idx, filename in enumerate(chapter_info['files'], start=1):
+                            image_path = f"/assets/comics/{chapter_info['comic_dir_name']}/{chapter_info['dir']}/{filename}"
+                            page_id = self.get_or_create_page(chapter_id, idx, image_path)
+                            if page_id:
+                                # optional: print per-page insert for verbose feedback
+                                if idx <= 3 or idx == len(chapter_info['files']):
+                                    print(f"      ✓ Page {idx} -> {image_path}")
         
         print("\n" + "="*60)
         print("✓ Database population complete!")
