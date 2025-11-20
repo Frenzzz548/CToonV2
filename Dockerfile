@@ -1,16 +1,27 @@
-# Use the official Tomcat base image
-FROM tomcat:9.0
+# Multi-stage build: build WAR with Maven (Java 17), then copy into Tomcat
+FROM maven:3.9.5-eclipse-temurin-17 AS builder
+WORKDIR /workspace
 
-# Set the working directory inside the container
+# Copy only what we need for a Maven build to leverage layer caching
+COPY pom.xml .
+# Copy source, webapp, and static assets so the in-container Maven build includes JSPs and resources
+COPY src ./src
+COPY webapp ./webapp
+COPY assets ./assets
+
+# Build the WAR (skip tests to speed up builds in CI)
+RUN mvn -B -DskipTests clean package
+
+FROM tomcat:9.0-jdk17-temurin
 WORKDIR /usr/local/tomcat
 
-# Remove the default ROOT application
+# Remove default ROOT app
 RUN rm -rf webapps/ROOT
 
-# Copy the WAR file to the Tomcat webapps directory
-COPY target/ctoon-1.0-SNAPSHOT.war webapps/ROOT.war
+# Copy the built WAR from the builder stage into Tomcat's webapps as ROOT.war
+COPY --from=builder /workspace/target/*.war webapps/ROOT.war
 
-# Expose the default Tomcat port
+# Expose default Tomcat port
 EXPOSE 8080
 
 # Start Tomcat
