@@ -24,13 +24,35 @@ public class ComicController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-
-        if ("viewChapter".equals(action)) {
-            viewChapter(request, response);
-        } else if ("viewComic".equals(action)) {
-            viewComic(request, response);
+        String path = request.getPathInfo();
+        if (path == null || path.equals("/")) {
+            // Homepage
+            List<Comic> recentComics = comicDAO.getRecentComics();
+            request.setAttribute("recentComics", recentComics);
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
+            return;
         }
+
+        // Remove leading slash
+        String comicName = path.substring(1);
+        Comic comic = comicDAO.getComicByName(comicName);
+        if (comic != null) {
+            request.setAttribute("comic", comic);
+            List<Rating> ratings = ratingDAO.getRatingsByComicId(comic.getId());
+            request.setAttribute("ratings", ratings);
+            boolean isBookmarked = false;
+            HttpSession session = request.getSession(false);
+            if (session != null && session.getAttribute("user") != null) {
+                int userId = ((User) session.getAttribute("user")).getId();
+                isBookmarked = bookmarkDAO.isBookmarked(userId, comic.getId());
+            }
+            request.setAttribute("isBookmarked", isBookmarked);
+            request.getRequestDispatcher("/comic.jsp").forward(request, response);
+            return;
+        }
+
+        // If not found, show 404
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 
     private void viewChapter(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
