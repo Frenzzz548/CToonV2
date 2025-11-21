@@ -164,3 +164,54 @@ For deployment issues:
 2. Review Tomcat logs: `docker logs <container-id>`
 3. Verify WAR file integrity: `unzip -t target/ctoon-1.0-SNAPSHOT.war`
 4. Test locally before pushing to production
+
+---
+
+# Deployment Instructions
+
+## 1. Build the Project
+
+Run the following command in the project root directory:
+
+```powershell
+mvn clean package
+```
+
+The generated WAR file will be located at:
+```
+target/ctoon-1.0-SNAPSHOT.war
+```
+
+## 2. Deploy to Tomcat
+
+1. Copy the WAR file from `target/ctoon-1.0-SNAPSHOT.war` to your Tomcat `webapps` directory.
+2. Start Tomcat. The application will be deployed automatically.
+
+## 3. Access the Application
+
+Open your browser and go to:
+```
+http://localhost:8080/ctoon-1.0-SNAPSHOT/
+```
+
+## 4. Database Setup
+
+To populate the database, run:
+```powershell
+python populate_database.py
+```
+
+## 5. Project Structure Reference
+
+```
+src/main/java/controller/         # Controllers
+src/main/java/dao/               # Data Access Objects
+src/main/java/model/             # Models
+src/main/java/util/              # Utilities
+src/main/resources/              # Resources
+src/main/webapp/                 # Web assets (JSP, CSS, JS, images)
+src/main/webapp/WEB-INF/web.xml  # Web application descriptor
+pom.xml                          # Maven build file
+README.md                        # Project documentation
+DEPLOYMENT.md                    # Deployment instructions
+```

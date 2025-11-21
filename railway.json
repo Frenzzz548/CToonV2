@@ -1,0 +1,12 @@
+{
+  "build": {
+    "builder": "Nixpacks",
+    "buildCommand": "mvn clean package"
+  },
+  "deploy": {
+    "startCommand": "java -jar target/ctoon-1.0-SNAPSHOT.war"
+  },
+  "env": {
+    "JAVA_VERSION": "17"
+  }
+}

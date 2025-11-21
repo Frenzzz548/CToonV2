@@ -21,8 +21,8 @@ DB_CONFIG = {
 }
 
 # Asset paths
-COVERS_DIR = os.path.join(os.path.dirname(__file__), 'webapp/assets/covers')
-COMICS_DIR = os.path.join(os.path.dirname(__file__), 'webapp/assets/comics')
+COVERS_DIR = os.path.join(os.path.dirname(__file__), 'src/main/webapp/assets/covers')
+COMICS_DIR = os.path.join(os.path.dirname(__file__), 'src/main/webapp/assets/comics')
 
 class CToonDBAutomation:
     def __init__(self):

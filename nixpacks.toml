@@ -1,0 +1,9 @@
+# Nixpacks configuration for Railway deployment
+[phases.build]
+cmds = ["mvn clean package"]
+
+[phases.start]
+cmds = ["java -jar target/ctoon-1.0-SNAPSHOT.war"]
+
+[variables]
+JAVA_VERSION = "17"
