@@ -12,10 +12,8 @@ cmds = [
 [phases.build]
 cmds = ["mvn clean package -DskipTests"]
 
-[phases.start]
-cmds = [
-  "cp target/ctoon-1.0-SNAPSHOT.war /opt/tomcat/webapps/ROOT.war && /opt/tomcat/bin/catalina.sh run"
-]
+[phases.runtime]
+cmd = "cp target/ctoon-1.0-SNAPSHOT.war /opt/tomcat/webapps/ROOT.war && /opt/tomcat/bin/catalina.sh run"
 
 [variables]
 JAVA_HOME = "/usr/lib/jvm/java-17-openjdk-amd64"
