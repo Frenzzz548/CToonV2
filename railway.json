@@ -1,12 +1,13 @@
 {
   "build": {
-    "builder": "Nixpacks",
-    "buildCommand": "mvn clean package"
+    "builder": "Nixpacks"
   },
   "deploy": {
-    "startCommand": "java -jar target/ctoon-1.0-SNAPSHOT.war"
+    "startCommand": "cp target/ctoon-1.0-SNAPSHOT.war /opt/tomcat/webapps/ROOT.war && /opt/tomcat/bin/catalina.sh run"
   },
   "env": {
-    "JAVA_VERSION": "17"
+    "JAVA_VERSION": "17",
+    "JAVA_HOME": "/usr/lib/jvm/java-17-openjdk-amd64",
+    "CATALINA_HOME": "/opt/tomcat"
   }
 }

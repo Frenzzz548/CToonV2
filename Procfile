@@ -1,1 +1,1 @@
-web: catalina.sh run
+web: /opt/tomcat/bin/catalina.sh run
