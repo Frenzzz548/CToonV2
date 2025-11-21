@@ -1,6 +1,26 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page import="dao.ComicDAO" %>
+<%@ page import="model.Comic" %>
+<%@ page import="java.util.List" %>
+<%
+    // Load comics data if not already loaded
+    try {
+        if (request.getAttribute("recentComics") == null) {
+            ComicDAO comicDAO = new ComicDAO();
+            List<Comic> recentComics = comicDAO.getRecentComics();
+            List<Comic> trendingComics = comicDAO.getTrendingComics();
+            request.setAttribute("recentComics", recentComics != null ? recentComics : new java.util.ArrayList<>());
+            request.setAttribute("trendingComics", trendingComics != null ? trendingComics : new java.util.ArrayList<>());
+        }
+    } catch (Exception e) {
+        // Log but don't fail - display sample data instead
+        e.printStackTrace();
+        request.setAttribute("recentComics", new java.util.ArrayList<>());
+        request.setAttribute("trendingComics", new java.util.ArrayList<>());
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>

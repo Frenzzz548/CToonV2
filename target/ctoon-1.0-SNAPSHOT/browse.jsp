@@ -1,5 +1,22 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="dao.ComicDAO" %>
+<%@ page import="model.Comic" %>
+<%@ page import="java.util.List" %>
+<%
+    // Load comics data if not already loaded
+    try {
+        if (request.getAttribute("comics") == null) {
+            ComicDAO comicDAO = new ComicDAO();
+            List<Comic> comics = comicDAO.getAllComics();
+            request.setAttribute("comics", comics != null ? comics : new java.util.ArrayList<>());
+        }
+    } catch (Exception e) {
+        // Log but don't fail - display sample data instead
+        e.printStackTrace();
+        request.setAttribute("comics", new java.util.ArrayList<>());
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>

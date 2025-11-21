@@ -3,7 +3,7 @@
     <a href="${pageContext.request.contextPath}/" class="logo">🎨 CToon</a>
     <ul class="nav-links">
         <li><a href="${pageContext.request.contextPath}/">Home</a></li>
-        <li><a href="${pageContext.request.contextPath}/browse.jsp">Browse</a></li>
+        <li><a href="${pageContext.request.contextPath}/browse">Browse</a></li>
         <li><a href="${pageContext.request.contextPath}/profile.jsp">Profile</a></li>
         <li>
             <div style="position: relative; display: flex; align-items: center;">
