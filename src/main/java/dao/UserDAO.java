@@ -11,17 +11,21 @@ public class UserDAO {
     private Connection connection;
 
     public UserDAO() {
-        try {
-            connection = util.DBUtil.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        // lazy connection: do not attempt to open DB connection during construction
+        this.connection = null;
+    }
+
+    private synchronized Connection getConnection() throws SQLException {
+        if (this.connection == null || this.connection.isClosed()) {
+            this.connection = util.DBUtil.getConnection();
         }
+        return this.connection;
     }
 
     public User authenticate(String username, String password) {
         try {
             String query = "SELECT * FROM users WHERE (username = ? OR email = ?) AND password = ?";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setString(1, username);
             stmt.setString(2, username);
             stmt.setString(3, password);
@@ -36,7 +40,7 @@ public class UserDAO {
                 return user;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return null;
     }
@@ -44,7 +48,7 @@ public class UserDAO {
     public User getUserById(int userId) {
         try {
             String query = "SELECT * FROM users WHERE id = ?";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
 
@@ -57,7 +61,7 @@ public class UserDAO {
                 return user;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return null;
     }
@@ -65,38 +69,38 @@ public class UserDAO {
     public void create(User user) {
         try {
             String query = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
     public void update(User user) {
         try {
             String query = "UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
             stmt.setInt(4, user.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
     public void delete(int userId) {
         try {
             String query = "DELETE FROM users WHERE id = ?";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, userId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
     }
 }

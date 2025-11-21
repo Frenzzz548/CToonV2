@@ -14,17 +14,21 @@ public class ComicDAO {
     private Connection connection;
 
     public ComicDAO() {
-        try {
-            connection = util.DBUtil.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        // lazy connection
+        this.connection = null;
+    }
+
+    private synchronized Connection getConnection() throws SQLException {
+        if (this.connection == null || this.connection.isClosed()) {
+            this.connection = util.DBUtil.getConnection();
         }
+        return this.connection;
     }
 
     public Comic getComicById(int comicId) {
         try {
             String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c WHERE c.id = ?";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, comicId);
             ResultSet rs = stmt.executeQuery();
 
@@ -40,7 +44,7 @@ public class ComicDAO {
                 return comic;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return null;
     }
@@ -49,7 +53,7 @@ public class ComicDAO {
         List<Comic> comics = new ArrayList<>();
         try {
             String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c LIMIT 50";
-            Statement stmt = connection.createStatement();
+            Statement stmt = getConnection().createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 Comic comic = new Comic();
@@ -63,7 +67,7 @@ public class ComicDAO {
                 comics.add(comic);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return comics;
     }
@@ -72,7 +76,7 @@ public class ComicDAO {
         List<Comic> comics = new ArrayList<>();
         try {
             String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c ORDER BY c.id DESC LIMIT 6";
-            Statement stmt = connection.createStatement();
+            Statement stmt = getConnection().createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 Comic comic = new Comic();
@@ -86,7 +90,7 @@ public class ComicDAO {
                 comics.add(comic);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return comics;
     }
@@ -95,7 +99,7 @@ public class ComicDAO {
         List<Comic> comics = new ArrayList<>();
         try {
             String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c ORDER BY c.views DESC LIMIT 6";
-            Statement stmt = connection.createStatement();
+            Statement stmt = getConnection().createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 Comic comic = new Comic();
@@ -109,7 +113,7 @@ public class ComicDAO {
                 comics.add(comic);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return comics;
     }
@@ -118,7 +122,7 @@ public class ComicDAO {
         try {
             // slug is expected to be lowercase with dashes replacing spaces
             String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c WHERE REPLACE(LOWER(c.title),' ', '-') = ? LIMIT 1";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setString(1, slug.toLowerCase());
             ResultSet rs = stmt.executeQuery();
 
@@ -134,7 +138,7 @@ public class ComicDAO {
                 return comic;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return null;
     }
@@ -144,7 +148,7 @@ public class ComicDAO {
         try {
             String like = "%" + q + "%";
             String query = "SELECT c.*, COALESCE((SELECT ROUND(AVG(stars),2) FROM ratings r WHERE r.comic_id = c.id),0) AS average_rating FROM comics c WHERE c.title LIKE ? OR c.description LIKE ? LIMIT 50";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setString(1, like);
             stmt.setString(2, like);
             ResultSet rs = stmt.executeQuery();
@@ -160,7 +164,7 @@ public class ComicDAO {
                 comics.add(comic);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return comics;
     }

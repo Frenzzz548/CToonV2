@@ -11,17 +11,20 @@ public class BookmarkDAO {
     private Connection connection;
 
     public BookmarkDAO() {
-        try {
-            connection = util.DBUtil.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        this.connection = null;
+    }
+
+    private synchronized Connection getConnection() throws SQLException {
+        if (this.connection == null || this.connection.isClosed()) {
+            this.connection = util.DBUtil.getConnection();
         }
+        return this.connection;
     }
 
     public boolean isBookmarked(int userId, int comicId) {
         try {
             String query = "SELECT COUNT(*) FROM bookmarks WHERE user_id = ? AND comic_id = ?";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, userId);
             stmt.setInt(2, comicId);
             ResultSet rs = stmt.executeQuery();
@@ -29,7 +32,7 @@ public class BookmarkDAO {
                 return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return false;
     }
@@ -37,24 +40,24 @@ public class BookmarkDAO {
     public void addBookmark(Bookmark bookmark) {
         try {
             String query = "INSERT INTO bookmarks (user_id, comic_id) VALUES (?, ?)";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, bookmark.getUserId());
             stmt.setInt(2, bookmark.getComicId());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
     public void removeBookmark(int userId, int comicId) {
         try {
             String query = "DELETE FROM bookmarks WHERE user_id = ? AND comic_id = ?";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, userId);
             stmt.setInt(2, comicId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
     }
 }

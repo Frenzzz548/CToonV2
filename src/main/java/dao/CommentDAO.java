@@ -13,18 +13,21 @@ public class CommentDAO {
     private Connection connection;
 
     public CommentDAO() {
-        try {
-            connection = util.DBUtil.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        this.connection = null;
+    }
+
+    private synchronized Connection getConnection() throws SQLException {
+        if (this.connection == null || this.connection.isClosed()) {
+            this.connection = util.DBUtil.getConnection();
         }
+        return this.connection;
     }
 
     public List<Comment> getCommentsByChapterId(int chapterId) {
         List<Comment> comments = new ArrayList<>();
         try {
             String query = "SELECT * FROM comments WHERE chapter_id = ?";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, chapterId);
             ResultSet rs = stmt.executeQuery();
 
@@ -38,7 +41,7 @@ public class CommentDAO {
                 comments.add(comment);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return comments;
     }
@@ -46,13 +49,13 @@ public class CommentDAO {
     public void addComment(Comment comment) {
         try {
             String query = "INSERT INTO comments (user_id, chapter_id, content, created_at) VALUES (?, ?, ?, NOW())";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, comment.getUserId());
             stmt.setInt(2, comment.getChapterId());
             stmt.setString(3, comment.getContent());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
@@ -61,7 +64,7 @@ public class CommentDAO {
         List<Comment> comments = new ArrayList<>();
         try {
             String query = "SELECT c.*, u.username FROM comments c JOIN chapters ch ON c.chapter_id = ch.id JOIN users u ON c.user_id = u.id WHERE ch.comic_id = ? ORDER BY c.created_at DESC";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, comicId);
             ResultSet rs = stmt.executeQuery();
 
@@ -76,7 +79,7 @@ public class CommentDAO {
                 comments.add(comment);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return comments;
     }

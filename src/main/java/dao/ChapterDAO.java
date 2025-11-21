@@ -14,17 +14,20 @@ public class ChapterDAO {
     private Connection connection;
 
     public ChapterDAO() {
-        try {
-            connection = util.DBUtil.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        this.connection = null;
+    }
+
+    private synchronized Connection getConnection() throws SQLException {
+        if (this.connection == null || this.connection.isClosed()) {
+            this.connection = util.DBUtil.getConnection();
         }
+        return this.connection;
     }
 
     public Chapter getChapterById(int chapterId) {
         try {
             String query = "SELECT * FROM chapters WHERE id = ?";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, chapterId);
             ResultSet rs = stmt.executeQuery();
 
@@ -37,7 +40,7 @@ public class ChapterDAO {
                 return chapter;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return null;
     }
@@ -46,7 +49,7 @@ public class ChapterDAO {
         List<Chapter> chapters = new ArrayList<>();
         try {
             String query = "SELECT * FROM chapters WHERE comic_id = ? ORDER BY number ASC";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, comicId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -58,7 +61,7 @@ public class ChapterDAO {
                 chapters.add(chapter);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return chapters;
     }
@@ -67,7 +70,7 @@ public class ChapterDAO {
         List<Page> pages = new ArrayList<>();
         try {
             String query = "SELECT * FROM pages WHERE chapter_id = ? ORDER BY page_number ASC";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, chapterId);
             ResultSet rs = stmt.executeQuery();
 
@@ -80,7 +83,7 @@ public class ChapterDAO {
                 pages.add(page);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return pages;
     }

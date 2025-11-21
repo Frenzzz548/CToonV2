@@ -13,18 +13,21 @@ public class RatingDAO {
     private Connection connection;
 
     public RatingDAO() {
-        try {
-            connection = util.DBUtil.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        this.connection = null;
+    }
+
+    private synchronized Connection getConnection() throws SQLException {
+        if (this.connection == null || this.connection.isClosed()) {
+            this.connection = util.DBUtil.getConnection();
         }
+        return this.connection;
     }
 
     public List<Rating> getRatingsByComicId(int comicId) {
         List<Rating> ratings = new ArrayList<>();
         try {
             String query = "SELECT * FROM ratings WHERE comic_id = ?";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, comicId);
             ResultSet rs = stmt.executeQuery();
 
@@ -37,7 +40,7 @@ public class RatingDAO {
                 ratings.add(rating);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return ratings;
     }
@@ -51,21 +54,21 @@ public class RatingDAO {
     public void addOrUpdateRating(Rating rating) {
         try {
             String update = "UPDATE ratings SET stars = ? WHERE user_id = ? AND comic_id = ?";
-            PreparedStatement up = connection.prepareStatement(update);
+            PreparedStatement up = getConnection().prepareStatement(update);
             up.setInt(1, rating.getStars());
             up.setInt(2, rating.getUserId());
             up.setInt(3, rating.getComicId());
             int affected = up.executeUpdate();
             if (affected == 0) {
                 String insert = "INSERT INTO ratings (user_id, comic_id, stars) VALUES (?, ?, ?)";
-                PreparedStatement in = connection.prepareStatement(insert);
+                PreparedStatement in = getConnection().prepareStatement(insert);
                 in.setInt(1, rating.getUserId());
                 in.setInt(2, rating.getComicId());
                 in.setInt(3, rating.getStars());
                 in.executeUpdate();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
@@ -73,7 +76,7 @@ public class RatingDAO {
     public double getAverageForComic(int comicId) {
         try {
             String query = "SELECT COALESCE(AVG(stars),0) AS avg_stars FROM ratings WHERE comic_id = ?";
-            PreparedStatement stmt = connection.prepareStatement(query);
+            PreparedStatement stmt = getConnection().prepareStatement(query);
             stmt.setInt(1, comicId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -81,7 +84,7 @@ public class RatingDAO {
                 return Math.round(avg * 100.0) / 100.0;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         return 0.0;
     }
