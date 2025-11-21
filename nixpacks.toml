@@ -1,9 +1,19 @@
-# Nixpacks configuration for Railway deployment
+# Nixpacks configuration for Railway deployment with Tomcat
+[phases.setup]
+cmds = [
+  "apt-get update && apt-get install -y tomcat9 maven openjdk-17-jdk"
+]
+
 [phases.build]
-cmds = ["mvn clean package"]
+cmds = [
+  "mvn clean package"
+]
 
 [phases.start]
-cmds = ["java -jar target/ctoon-1.0-SNAPSHOT.war"]
+cmds = [
+  "cp target/ctoon-1.0-SNAPSHOT.war /var/lib/tomcat9/webapps/",
+  "catalina.sh run"
+]
 
 [variables]
 JAVA_VERSION = "17"
