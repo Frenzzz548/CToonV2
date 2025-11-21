@@ -1,5 +1,5 @@
-[# Nixpacks configuration for Railway deployment with Tomcat 9
-# Using Tomcat 9 keeps compatibility with `javax.servlet` APIs used in this project]
+[# Nixpacks configuration for Railway deployment with Tomcat 9]
+# Using Tomcat 9 keeps compatibility with `javax.servlet` APIs used in this project
 [phases.setup]
 pkgs = ["jdk17", "maven"]
 cmds = [
@@ -13,13 +13,12 @@ cmds = [
 [phases.build]
 cmds = [
   "mvn -v",
-  "mvn clean package -DskipTests"
+  "mvn clean package -DskipTests -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8"
 ]
 
 [phases.runtime]
 cmd = "cp target/ctoon-1.0-SNAPSHOT.war /opt/tomcat/webapps/ROOT.war && /opt/tomcat/bin/catalina.sh run"
 
 [variables]
-JAVA_HOME = "/usr/lib/jvm/java-17-openjdk-amd64"
 JAVA_VERSION = "17"
 CATALINA_HOME = "/opt/tomcat"
