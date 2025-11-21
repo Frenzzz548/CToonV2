@@ -8,9 +8,9 @@ REM Build the project
 mvn clean package -f pom.xml
 
 REM Check if build was successful
-if exist target\ctoon-1.0-SNAPSHOT.war (
+if exist target\ROOT.war (
     echo Build successful. Deploying WAR file...
-    copy /Y target\ctoon-1.0-SNAPSHOT.war %TOMCAT_WEBAPPS_DIR%\ctoon.war
+    copy /Y target\ROOT.war %TOMCAT_WEBAPPS_DIR%\ROOT.war
     echo Deployment complete.
 ) else (
     echo Build failed. WAR file not found.
