@@ -1,6 +1,11 @@
 package util;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -29,5 +34,41 @@ public class StartupListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         System.out.println("[StartupListener] context destroyed");
+
+        // Deregister JDBC drivers that were registered by this webapp's classloader
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+        while (drivers.hasMoreElements()) {
+            Driver driver = drivers.nextElement();
+            if (driver.getClass().getClassLoader() == cl) {
+                try {
+                    DriverManager.deregisterDriver(driver);
+                    System.out.println("[StartupListener] Deregistered JDBC driver: " + driver);
+                } catch (SQLException ex) {
+                    System.err.println("[StartupListener] Error deregistering driver: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            } else {
+                System.out
+                        .println("[StartupListener] Not deregistering JDBC driver (owned by a different ClassLoader): "
+                                + driver);
+            }
+        }
+
+        // Try to shutdown MySQL AbandonedConnectionCleanupThread (if present)
+        try {
+            Class<?> cleanupClass = Class.forName("com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
+            Method shutdownMethod = cleanupClass.getMethod("checkedShutdown");
+            shutdownMethod.invoke(null);
+            System.out.println("[StartupListener] AbandonedConnectionCleanupThread checkedShutdown invoked.");
+        } catch (ClassNotFoundException cnfe) {
+            // MySQL driver not present or different version; ignore
+            System.out.println(
+                    "[StartupListener] MySQL AbandonedConnectionCleanupThread class not found: " + cnfe.getMessage());
+        } catch (Throwable t) {
+            System.err.println(
+                    "[StartupListener] Error shutting down AbandonedConnectionCleanupThread: " + t.getMessage());
+            t.printStackTrace();
+        }
     }
 }
