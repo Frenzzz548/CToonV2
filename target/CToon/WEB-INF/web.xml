@@ -13,20 +13,6 @@
     <listener>
         <listener-class>util.StartupListener</listener-class>
     </listener>
-    <servlet>
-        <servlet-name>HealthServlet</servlet-name>
-        <servlet-class>util.HealthServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>HealthServlet</servlet-name>
-        <url-pattern>/health</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>ReadyServlet</servlet-name>
-        <servlet-class>util.ReadyServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ReadyServlet</servlet-name>
-        <url-pattern>/ready</url-pattern>
-    </servlet-mapping>
+
+
 </web-app>
