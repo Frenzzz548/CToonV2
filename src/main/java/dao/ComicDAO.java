@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Comic;
+import model.Genre;
 
 public class ComicDAO {
     private Connection connection;
@@ -23,6 +24,16 @@ public class ComicDAO {
             this.connection = util.DBUtil.getConnection();
         }
         return this.connection;
+    }
+
+    private void loadGenresForComic(Comic comic) {
+        try {
+            GenreDAO genreDAO = new GenreDAO();
+            List<Genre> genres = genreDAO.getGenresByComicId(comic.getId());
+            comic.setGenres(genres);
+        } catch (Exception e) {
+            System.err.println("Error loading genres for comic: " + e.getMessage());
+        }
     }
 
     public Comic getComicById(int comicId) {
@@ -65,6 +76,7 @@ public class ComicDAO {
                 comic.setCategory(rs.getString("category"));
                 comic.setAverageRating(rs.getDouble("average_rating"));
                 comic.setViews(rs.getInt("views"));
+                loadGenresForComic(comic);
                 comics.add(comic);
             }
             System.out.println("Successfully fetched " + comics.size() + " comics from database");

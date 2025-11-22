@@ -61,18 +61,13 @@
                     <c:forEach items="${comics}" var="comic" varStatus="status">
                         <div class="card">
                             <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); height: 100px; border-radius: 8px; margin: -1.5rem -1.5rem 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; font-weight: bold;">
-                                <c:choose>
-                                    <c:when test="${status.count % 6 == 1}">ACTION</c:when>
-                                    <c:when test="${status.count % 6 == 2}">ROMANCE</c:when>
-                                    <c:when test="${status.count % 6 == 3}">FANTASY</c:when>
-                                    <c:when test="${status.count % 6 == 4}">COMEDY</c:when>
-                                    <c:when test="${status.count % 6 == 5}">DRAMA</c:when>
-                                    <c:otherwise>ADVENTURE</c:otherwise>
-                                </c:choose>
+                                <c:out value="${comic.category}"/>
                             </div>
                             <h3><c:out value="${comic.title}"/></h3>
                             <p style="margin: 0.5rem 0; font-size: 0.9rem; color: #888;">
-                                <span class="badge badge-primary"><c:out value="${comic.category}"/></span>
+                                <c:forEach items="${comic.genres}" var="genre">
+                                    <span class="badge badge-primary"><c:out value="${genre.name}"/></span>
+                                </c:forEach>
                                 <span style="float: right;"><c:out value="${comic.averageRating}"/>/5</span>
                             </p>
                             <p><c:out value="${comic.description}"/></p>

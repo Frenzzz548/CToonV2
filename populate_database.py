@@ -13,11 +13,11 @@ from mysql.connector import errorcode
 
 # Database Configuration - use environment variables for security
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'port': int(os.getenv('DB_PORT', 3306)),
-    'user': os.getenv('DB_USER', 'root'),
-    'password': os.getenv('DB_PASSWORD', ''),
-    'database': os.getenv('DB_NAME', 'ctoon')
+    'host': 'shinkansen.proxy.rlwy.net',
+    'port': 54128,
+    'user': 'root',
+    'password': 'oRsqyOGrDWrBUBLYeGBxajubkknNXcuu',
+    'database': 'railway'
 }
 
 # Asset paths
@@ -117,7 +117,7 @@ class CToonDBAutomation:
         
         return comics
     
-    def get_or_create_comic(self, title, description, cover_path, category):
+    def get_or_create_comic(self, title, description, cover_path, genres):
         """Get existing comic or create new one"""
         try:
             # Check if comic exists
@@ -130,12 +130,30 @@ class CToonDBAutomation:
                 print(f"  ✓ Comic '{title}' exists (ID: {comic_id})")
                 return comic_id
             else:
-                # Insert new comic
+                # Insert new comic (category is deprecated, use genres instead)
                 query = "INSERT INTO comics (title, description, cover_path, category, average_rating, views) VALUES (%s, %s, %s, %s, %s, %s)"
-                self.cursor.execute(query, (title, description, cover_path, category, 0.0, 0))
+                self.cursor.execute(query, (title, description, cover_path, genres[0] if genres else 'Manga', 0.0, 0))
                 self.conn.commit()
                 comic_id = self.cursor.lastrowid
                 print(f"  ✓ Comic '{title}' created (ID: {comic_id})")
+                
+                # Add genres for this comic
+                if genres:
+                    for genre_name in genres:
+                        try:
+                            # Get genre ID
+                            query = "SELECT id FROM genres WHERE name = %s"
+                            self.cursor.execute(query, (genre_name,))
+                            genre = self.cursor.fetchone()
+                            
+                            if genre:
+                                # Link comic to genre
+                                insert_query = "INSERT INTO comic_genres (comic_id, genre_id) VALUES (%s, %s)"
+                                self.cursor.execute(insert_query, (comic_id, genre['id']))
+                                self.conn.commit()
+                        except mysql.connector.Error as err:
+                            print(f"    Error adding genre '{genre_name}': {err}")
+                
                 return comic_id
         except mysql.connector.Error as err:
             print(f"  ✗ Error with comic '{title}': {err}")
@@ -197,23 +215,23 @@ class CToonDBAutomation:
         print("💾 Populating database...")
         print("="*60)
         
-        # Map categories based on comic names
-        categories = {
-            'Kimetsu no Yaiba': 'Action',
-            'Chainsaw Man': 'Action',
-            'Attack on Titan': 'Action'
+        # Map genres for each comic (can have multiple)
+        comic_genres = {
+            'Kimetsu no Yaiba': ['Action', 'Adventure'],
+            'Chainsaw Man': ['Action', 'Adventure'],
+            'Attack on Titan': ['Action', 'Adventure']
         }
         
         # Process each comic
         for comic_name, chapter_list in chapters.items():
             cover_info = covers.get(comic_name, {})
             cover_path = cover_info.get('main_cover', '/assets/covers/default.png')
-            category = categories.get(comic_name, 'Manga')
+            genres = comic_genres.get(comic_name, ['Manga'])
 
             description = f"A popular manga series with {len(chapter_list)} chapters available."
 
             print(f"\n📖 Processing '{comic_name}'...")
-            comic_id = self.get_or_create_comic(comic_name, description, cover_path, category)
+            comic_id = self.get_or_create_comic(comic_name, description, cover_path, genres)
 
             if comic_id:
                 # Add chapters and pages

@@ -1,5 +1,8 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Comic {
     private int id;
     private String title;
@@ -12,6 +15,11 @@ public class Comic {
     private int reviews;
     private String status;
     private String author;
+    private List<Genre> genres;
+
+    public Comic() {
+        this.genres = new ArrayList<>();
+    }
 
     public int getId() {
         return id;
@@ -99,5 +107,20 @@ public class Comic {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
+    }
+
+    public void addGenre(Genre genre) {
+        if (this.genres == null) {
+            this.genres = new ArrayList<>();
+        }
+        this.genres.add(genre);
     }
 }
