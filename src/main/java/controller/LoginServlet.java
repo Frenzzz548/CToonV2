@@ -61,8 +61,9 @@ public class LoginServlet extends HttpServlet {
             User user = userDAO.authenticate(username, password);
 
             if (user != null) {
-                // Create session
+                // Create session and store User object for JSP access
                 HttpSession session = request.getSession();
+                session.setAttribute("user", user);
                 session.setAttribute("userId", user.getId());
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("email", user.getEmail());
@@ -145,6 +146,7 @@ public class LoginServlet extends HttpServlet {
             User createdUser = userDAO.authenticate(username, password);
             if (createdUser != null) {
                 HttpSession session = request.getSession();
+                session.setAttribute("user", createdUser);
                 session.setAttribute("userId", createdUser.getId());
                 session.setAttribute("username", createdUser.getUsername());
                 session.setAttribute("email", createdUser.getEmail());

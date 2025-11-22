@@ -2,6 +2,7 @@ E:\CTOOOOOOOON\CToonV2\src\main\java\controller\HomeController.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\controller\LoginServlet.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\model\User.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\model\Rating.java
+E:\CTOOOOOOOON\CToonV2\src\main\java\controller\LogoutServlet.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\util\DBUtil.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\util\StartupListener.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\util\HealthServlet.java
@@ -15,6 +16,7 @@ E:\CTOOOOOOOON\CToonV2\src\main\java\dao\CommentDAO.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\model\Comic.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\controller\BrowseController.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\model\Comment.java
+E:\CTOOOOOOOON\CToonV2\src\main\java\controller\BookmarkServlet.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\model\Genre.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\dao\ChapterDAO.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\model\Chapter.java
@@ -23,3 +25,4 @@ E:\CTOOOOOOOON\CToonV2\src\main\java\dao\RatingDAO.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\dao\BookmarkDAO.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\model\Bookmark.java
 E:\CTOOOOOOOON\CToonV2\src\main\java\controller\ComicDetailController.java
+E:\CTOOOOOOOON\CToonV2\src\main\java\controller\ProfileServlet.java

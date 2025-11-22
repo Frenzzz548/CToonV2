@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,6 +62,47 @@
                 <p>No comments available. Be the first to read this chapter!</p>
             </div>
         </div>
+            <c:set var="prevChapter" value="" />
+            <c:set var="nextChapter" value="" />
+            <c:if test="${not empty chapters}">
+                <c:forEach items="${chapters}" var="ch" varStatus="st">
+                    <c:if test="${ch.id == chapter.id}">
+                        <c:if test="${st.index > 0}">
+                            <c:set var="prevChapter" value="${chapters[st.index - 1]}" />
+                        </c:if>
+                        <c:if test="${st.index lt fn:length(chapters) - 1}">
+                            <c:set var="nextChapter" value="${chapters[st.index + 1]}" />
+                        </c:if>
+                    </c:if>
+                </c:forEach>
+            </c:if>
+
+            <div style="text-align: center; margin: 3rem 0; display: flex; gap: 1rem; justify-content: center;">
+                <c:choose>
+                    <c:when test="${not empty prevChapter}">
+                        <a href="${pageContext.request.contextPath}/chapter?id=${prevChapter.id}" class="btn btn-secondary">← Previous Chapter</a>
+                    </c:when>
+                    <c:otherwise>
+                        <button class="btn btn-secondary" disabled>← Previous Chapter</button>
+                    </c:otherwise>
+                </c:choose>
+
+                <a href="${pageContext.request.contextPath}/comic-detail?id=${comic.id}" class="btn">Back to Comic</a>
+
+                <c:choose>
+                    <c:when test="${not empty nextChapter}">
+                        <a href="${pageContext.request.contextPath}/chapter?id=${nextChapter.id}" class="btn">Next Chapter →</a>
+                    </c:when>
+                    <c:otherwise>
+                        <button class="btn" disabled>Next Chapter →</button>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </main>
+    
+        <!-- theme toggle moved to navbar -->
+    </body>
+    </html>
     </div>
 
     <style>

@@ -13,13 +13,16 @@ controller\ChapterViewController.class
 util\ReadyServlet.class
 dao\ComicDAO.class
 dao\GenreDAO.class
+controller\ProfileServlet.class
 model\User.class
 controller\LoginServlet.class
 model\Page.class
+controller\BookmarkServlet.class
 dao\CommentDAO.class
 util\StartupListener.class
 controller\ComicDetailController.class
 dao\BookmarkDAO.class
+controller\LogoutServlet.class
 model\Chapter.class
 model\Rating.class
 model\Comment.class

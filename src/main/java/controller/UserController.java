@@ -146,6 +146,8 @@ public class UserController extends HttpServlet {
 
             if (user != null) {
                 HttpSession session = request.getSession();
+                // store User object for JSPs to use as sessionScope.user
+                session.setAttribute("user", user);
                 session.setAttribute("userId", user.getId());
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("email", user.getEmail());

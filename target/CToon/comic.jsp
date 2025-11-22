@@ -32,7 +32,17 @@
                     <p style="color: #666;">Author: <c:out default="Unknown" value="${comic.author}"/></p>
                     <p style="margin: 1rem 0;">⭐<strong><c:out value="${avgRating}" default="0.00"/></strong>/5</p>
                     <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn" style="flex: 1;">❤️ Bookmark</button>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.user}">
+                                <form method="post" action="${pageContext.request.contextPath}/bookmark" style="flex:1;">
+                                    <input type="hidden" name="comicId" value="${comic.id}" />
+                                    <button class="btn" type="submit" style="width:100%;">❤️ Bookmark</button>
+                                </form>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${pageContext.request.contextPath}/login.jsp" class="btn" style="flex:1; display:inline-block; text-align:center;">Log in to Bookmark</a>
+                            </c:otherwise>
+                        </c:choose>
                         <button class="btn btn-secondary" style="flex: 1;">⭐ Rate</button>
                     </div>
                 </div>
@@ -136,8 +146,6 @@
         </div>
     </main>
     
-    <footer>
-        <button id="theme-toggle">🌙 Dark Mode</button>
-    </footer>
+    <!-- theme toggle moved to navbar -->
 </body>
 </html>

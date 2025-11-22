@@ -93,8 +93,6 @@
         </div>
     </main>
     
-    <footer>
-        <button id="theme-toggle">Dark Mode</button>
-    </footer>
+    <!-- theme toggle moved to navbar -->
 </body>
 </html>
