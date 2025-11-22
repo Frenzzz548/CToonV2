@@ -8,6 +8,7 @@ public class Comic {
     private String category;
     private double averageRating;
     private int views;
+    private int bookmarks;
 
     public int getId() {
         return id;
@@ -63,5 +64,13 @@ public class Comic {
 
     public void setViews(int views) {
         this.views = views;
+    }
+
+    public int getBookmarks() {
+        return bookmarks;
+    }
+
+    public void setBookmarks(int bookmarks) {
+        this.bookmarks = bookmarks;
     }
 }

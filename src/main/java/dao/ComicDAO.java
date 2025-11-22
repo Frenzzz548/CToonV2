@@ -45,6 +45,7 @@ public class ComicDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error fetching comic by ID: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
@@ -91,8 +92,10 @@ public class ComicDAO {
                 comic.setViews(rs.getInt("views"));
                 comics.add(comic);
             }
+            System.out.println("Successfully fetched " + comics.size() + " recent comics");
         } catch (SQLException e) {
             System.err.println("Error fetching recent comics: " + e.getMessage());
+            e.printStackTrace();
         }
         return comics;
     }
@@ -114,8 +117,10 @@ public class ComicDAO {
                 comic.setViews(rs.getInt("views"));
                 comics.add(comic);
             }
+            System.out.println("Successfully fetched " + comics.size() + " trending comics");
         } catch (SQLException e) {
             System.err.println("Error fetching trending comics: " + e.getMessage());
+            e.printStackTrace();
         }
         return comics;
     }
@@ -140,7 +145,8 @@ public class ComicDAO {
                 return comic;
             }
         } catch (SQLException e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("Error fetching comic by slug: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
@@ -165,8 +171,10 @@ public class ComicDAO {
                 comic.setViews(rs.getInt("views"));
                 comics.add(comic);
             }
+            System.out.println("Successfully found " + comics.size() + " comics matching '" + q + "'");
         } catch (SQLException e) {
             System.err.println("Error searching comics: " + e.getMessage());
+            e.printStackTrace();
         }
         return comics;
     }

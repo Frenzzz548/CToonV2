@@ -15,15 +15,38 @@ public class DBUtil {
             System.err.println("MySQL JDBC driver not found: " + e.getMessage());
             throw new SQLException("Failed to load JDBC driver", e);
         }
-        System.out.println("Connecting to database: " + url);
-        return DriverManager.getConnection(url, user, password);
+        System.out.println("Attempting database connection to: " + url);
+        System.out.println("Using user: " + user);
+        try {
+            Connection conn = DriverManager.getConnection(url, user, password);
+            System.out.println("Database connection successful!");
+            return conn;
+        } catch (SQLException e) {
+            System.err.println("Failed to connect to database: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     private static String getDbUrl() {
         // Try to get pre-built URL first
         String url = System.getenv("DB_URL");
         if (url != null && !url.isEmpty()) {
-            return url;
+            // If it's already a JDBC URL, use it as-is
+            if (url.startsWith("jdbc:")) {
+                return url;
+            }
+            // If it's a Railway-style URL (mysql://...), convert it
+            if (url.startsWith("mysql://")) {
+                // Format: mysql://user:password@host:port/database
+                // Extract just host:port/database part and convert to JDBC
+                String jdbcUrl = "jdbc:" + url;
+                // Add SSL options if not already present
+                if (!jdbcUrl.contains("useSSL")) {
+                    jdbcUrl += "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+                }
+                return jdbcUrl;
+            }
         }
 
         // Build URL from individual components
@@ -32,12 +55,15 @@ public class DBUtil {
         String database = System.getenv("DB_NAME");
 
         if (host == null || port == null || database == null) {
+            System.err.println("DB_HOST: " + host);
+            System.err.println("DB_PORT: " + port);
+            System.err.println("DB_NAME: " + database);
             throw new RuntimeException(
                     "Database configuration incomplete. Set DB_URL or (DB_HOST, DB_PORT, DB_NAME) environment variables.");
         }
 
         return "jdbc:mysql://" + host + ":" + port + "/" + database
-                + "?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+                + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     }
 
     private static String getDbUser() {

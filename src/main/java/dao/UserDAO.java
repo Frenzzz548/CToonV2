@@ -41,6 +41,7 @@ public class UserDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error authenticating user: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
@@ -74,8 +75,10 @@ public class UserDAO {
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
             stmt.executeUpdate();
+            System.out.println("User created successfully: " + user.getUsername());
         } catch (SQLException e) {
             System.err.println("Error creating user: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -110,6 +113,7 @@ public class UserDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error fetching user by username: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }

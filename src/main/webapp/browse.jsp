@@ -76,7 +76,7 @@
                                 <span style="float: right;"><c:out value="${comic.averageRating}"/>/5</span>
                             </p>
                             <p><c:out value="${comic.description}"/></p>
-                            <p style="font-size: 0.85rem; color: #aaa; margin: 0.5rem 0;"><c:out value="${comic.views}"/> views • <c:out value="${comic.bookmarks}"/> bookmarks</p>
+                            <p style="font-size: 0.85rem; color: #aaa; margin: 0.5rem 0;"><c:out value="${comic.views}"/> views</p>
                             <a href="${pageContext.request.contextPath}/comic-detail?id=${comic.id}" class="btn" style="display: inline-block; width: auto;">View</a>
                         </div>
                     </c:forEach>
