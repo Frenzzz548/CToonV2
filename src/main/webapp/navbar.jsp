@@ -1,4 +1,3 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <nav>
     <a href="${pageContext.request.contextPath}/" class="logo">CToon</a>
@@ -27,8 +26,8 @@
                 <li><a href="${pageContext.request.contextPath}/signup.jsp" class="btn" style="background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5);">Sign Up</a></li>
             </c:otherwise>
         </c:choose>
+        <li>
+            <button id="theme-toggle" title="Toggle theme" style="background: transparent; border: none; color: white; cursor: pointer; font-size: 1.1rem;">🌙&nbsp;<span style="font-size:0.9rem;">Light Mode</span></button>
+        </li>
     </ul>
-    <div style="margin-left: auto; display: flex; align-items: center; gap: 0.5rem;">
-        <button id="theme-toggle" title="Toggle theme" style="background: transparent; border: none; color: white; cursor: pointer; font-size: 1.1rem;">🌙</button>
-    </div>
 </nav>
